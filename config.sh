@@ -2,22 +2,21 @@
 # config.sh - 部署配置文件
 
 # 最终用户
-DEPLOY_USER="s-ui"
-USER_EMAIL="daydreamer767910@gmail.com"
+DEPLOY_USER="sui"
+USER_EMAIL="youmail@gmail.com"
 
 # 时区
 TIMEZONE="America/Los_Angeles"
 
-# 这个值必须和 Nginx stream map 配置里的 SNI 一致,除非不使用443反代
+# 这个值必须和 Nginx stream map 配置里的 SNI 一致
 SNI="www.microsoft.com"
 
-# 域名列表
-DOMAINLIST=("dd2000.duckdns.org")
+# 域名列表(1个或多个)
+DOMAINLIST=("xxx.xxx.xxx" "yyy.yyy.yyy")
 
-# 证书源目录
+# 证书目录
 CERT_SRC="/etc/letsencrypt/live/${DOMAINLIST[0]}"
-NGINX_CERT_DST="/home/$DEPLOY_USER/Nginx/certbot"
-SINGBOX_CERT_DST="/home/$DEPLOY_USER/s-ui/cert"
+CERT_DST="/home/$DEPLOY_USER/cert"
 
 # Docker 容器名
 NGINX_CONTAINER="nginx"

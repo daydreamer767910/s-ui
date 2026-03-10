@@ -126,7 +126,6 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 ufw allow 443/udp
 ufw allow 8443/udp
-ufw allow 51820/udp
 if ! ufw status | grep -q "Status: active"; then
     ufw --force enable
 fi
@@ -147,19 +146,70 @@ then
 
     echo "==== Copying certificates..."
 
-    mkdir -p "$NGINX_CERT_DST" "$SINGBOX_CERT_DST"
+    mkdir -p "$CERT_DST"
 
-    rsync -a --copy-links "$CERT_SRC"/ "$NGINX_CERT_DST"/
-    rsync -a --copy-links "$CERT_SRC"/ "$SINGBOX_CERT_DST"/
+    rsync -a --copy-links "$CERT_SRC"/ "$CERT_DST"/
 
     # 修改权限
-    chown -R $DEPLOY_USER:$DEPLOY_USER "$NGINX_CERT_DST"
-    chown -R $DEPLOY_USER:$DEPLOY_USER "$SINGBOX_CERT_DST"
+    chown -R $DEPLOY_USER:$DEPLOY_USER "$CERT_DST"
 
     echo "==== Certificates copied successfully."
 else
     echo "!!!! Certificate obtain failed. Skipping copy step."
 fi
+
+echo "[INFO] Generating docker-compose.yml..."
+
+cat > /home/$DEPLOY_USER/docker-compose.yml <<EOF
+services:
+  nginx:
+    image: nginx:latest
+    container_name: ${NGINX_CONTAINER}
+    restart: unless-stopped
+    environment:
+      - TZ=${TIMEZONE}
+    networks:
+      lan:
+        ipv4_address: 172.19.0.3
+    ports:
+      - "443:443/tcp"
+    volumes:
+      - /home/$DEPLOY_USER/Nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${CERT_DST}:/etc/nginx/certbot:ro
+    depends_on:
+      - ${SINGBOX_CONTAINER}
+
+  s-ui:
+    image: alireza7/s-ui
+    container_name: ${SINGBOX_CONTAINER}
+    restart: unless-stopped
+    user: "${DEPLOY_UID}:${DEPLOY_GID}"
+    environment:
+      - TZ=${TIMEZONE}
+    volumes:
+      - /home/$DEPLOY_USER/s-ui/db:/app/db
+      - ${CERT_DST}:/app/cert:ro
+    tty: true
+    ports:
+      - "443:443/udp"
+      - "8443:8443/udp"
+    networks:
+      lan:
+        ipv4_address: 172.19.0.2
+    entrypoint: "./entrypoint.sh"
+
+networks:
+  lan:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
+EOF
+
+chown $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/docker-compose.yml
+echo "[INFO] docker-compose.yml generated."
 
 # -------------------------
 # 配置 sudo NOPASSWD 给最终用户

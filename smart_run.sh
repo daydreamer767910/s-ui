@@ -29,8 +29,8 @@ check_cert() {
 
     # Compare fullchain.pem
     src_hash=$(sudo sha256sum "$CERT_SRC/fullchain.pem" | awk '{print $1}')
-    if [ -f "$NGINX_CERT_DST/fullchain.pem" ]; then
-        dst_hash=$(sha256sum "$NGINX_CERT_DST/fullchain.pem" | awk '{print $1}')
+    if [ -f "$CERT_DST/fullchain.pem" ]; then
+        dst_hash=$(sha256sum "$CERT_DST/fullchain.pem" | awk '{print $1}')
     else
         dst_hash="MISSING"
     fi
@@ -42,8 +42,8 @@ check_cert() {
 
     # Compare privkey.pem
     src_hash=$(sudo sha256sum "$CERT_SRC/privkey.pem" | awk '{print $1}')
-    if [ -f "$NGINX_CERT_DST/privkey.pem" ]; then
-        dst_hash=$(sha256sum "$NGINX_CERT_DST/privkey.pem" | awk '{print $1}')
+    if [ -f "$CERT_DST/privkey.pem" ]; then
+        dst_hash=$(sha256sum "$CERT_DST/privkey.pem" | awk '{print $1}')
     else
         dst_hash="MISSING"
     fi
@@ -67,9 +67,8 @@ check_cert() {
 # ==========================
 copy_cert() {
     log "Copying certificates to Nginx and Sing-box directories..."
-    mkdir -p "$NGINX_CERT_DST" "$SINGBOX_CERT_DST"
-    sudo rsync -a --copy-links "$CERT_SRC"/ "$NGINX_CERT_DST"/
-    sudo rsync -a --copy-links "$CERT_SRC"/ "$SINGBOX_CERT_DST"/
+    mkdir -p "$CERT_DST"
+    sudo rsync -a --copy-links "$CERT_SRC"/ "$CERT_DST"/
     log "Certificates copied successfully."
 }
 
