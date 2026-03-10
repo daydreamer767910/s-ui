@@ -22,8 +22,8 @@ services:
     environment:
       - TZ=America/Los_Angeles
     volumes:
-      - "./db:/app/db"
-      - "./cert:/app/cert"
+      - "./s-ui/db:/app/db"
+      - "./s-ui/cert:/app/cert"
     tty: true
     restart: unless-stopped
     ports:
