@@ -1,0 +1,48 @@
+services:
+  nginx:
+    environment:
+      - TZ=America/Los_Angeles
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    networks:
+      lan:
+         ipv4_address: 172.19.0.3
+    ports:
+      - '443:443/tcp'
+    volumes:
+      - ./Nginx/conf/nginx.conf:/etc/nginx/nginx.conf
+      - ./Nginx/certbot:/etc/nginx/certbot
+    depends_on:
+      - s-ui
+
+  s-ui:
+    image: alireza7/s-ui
+    container_name: s-ui
+    environment:
+      - TZ=America/Los_Angeles
+    volumes:
+      - "./db:/app/db"
+      - "./cert:/app/cert"
+    tty: true
+    restart: unless-stopped
+    ports:
+      #VLESS / Reality 
+      #- '7443:443/tcp' (走nginx 443反代)
+      #TUIC
+      - '443:443/udp'
+      #Hysteria2
+      - '8443:444/udp'
+    networks:
+      lan:
+        ipv4_address: 172.19.0.2
+    entrypoint: "./entrypoint.sh"
+
+networks:
+  lan:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.19.0.0/16
+          gateway: 172.19.0.1
