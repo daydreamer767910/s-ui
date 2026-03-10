@@ -182,7 +182,6 @@ services:
     image: alireza7/s-ui
     container_name: ${SINGBOX_CONTAINER}
     restart: unless-stopped
-    user: "${DEPLOY_UID}:${DEPLOY_GID}"
     environment:
       - TZ=${TIMEZONE}
     volumes:
