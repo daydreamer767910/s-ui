@@ -95,9 +95,8 @@ echo "[INFO] Copying repository contents to /home/$DEPLOY_USER..."
 
 LOG_DIR="$(dirname "$LOG_FILE")"
 
-# 确保日志目录存在
 mkdir -p "$LOG_DIR"
-
+mkdir -p "/home/$DEPLOY_USER/s-ui/db"
 # rsync 时排除用户数据和配置目录
 rsync -a \
     --exclude='s-ui/db/' \
