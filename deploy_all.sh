@@ -97,6 +97,7 @@ LOG_DIR="$(dirname "$LOG_FILE")"
 
 mkdir -p "$LOG_DIR"
 mkdir -p "/home/$DEPLOY_USER/s-ui/db"
+mkdir -p "/home/$DEPLOY_USER/tailscale"
 # rsync 时排除用户数据和配置目录
 rsync -a \
     --exclude='s-ui/db/' \
@@ -125,6 +126,8 @@ ufw allow 80/tcp
 ufw allow 443/tcp
 ufw allow 443/udp
 ufw allow 8443/udp
+#ufw allow 3478/udp
+ufw allow 41641/udp
 if ! ufw status | grep -q "Status: active"; then
     ufw --force enable
 fi
@@ -167,9 +170,6 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
-    networks:
-      lan:
-        ipv4_address: 172.19.0.3
     ports:
       - "443:443/tcp"
     volumes:
@@ -191,19 +191,20 @@ services:
     ports:
       - "443:443/udp"
       - "8443:8443/udp"
-    networks:
-      lan:
-        ipv4_address: 172.19.0.2
     entrypoint: "./entrypoint.sh"
 
-networks:
-  lan:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.19.0.0/16
-          gateway: 172.19.0.1
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: tailscale
+    network_mode: "host"           # 必须 host 模式
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - /home/$DEPLOY_USER/tailscale:/var/lib/tailscale
+      - /dev/net/tun:/dev/net/tun
+    command: ["tailscaled", "--state=/var/lib/tailscale/tailscaled.state"]
+
 EOF
 
 chown $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER/docker-compose.yml
@@ -234,3 +235,4 @@ echo "==== [DEPLOY] Deployment complete! ===="
 echo "Next steps:"
 echo "1. Switch to user: su - $DEPLOY_USER"
 echo "2. Run docker compose up -d for initial sync"
+echo "3. Run docker exec -it tailscale tailscale up"
