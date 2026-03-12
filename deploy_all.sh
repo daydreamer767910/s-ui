@@ -101,6 +101,7 @@ mkdir -p "/home/$DEPLOY_USER/tailscale"
 # rsync 时排除用户数据和配置目录
 rsync -a \
     --exclude='s-ui/db/' \
+    --exclude='tailscale/' \
     --exclude='deploy_all.sh' \
     --exclude='*.md' \
     --exclude='.git' \
@@ -184,6 +185,7 @@ services:
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
+    user: "${DEPLOY_UID}:${DEPLOY_GID}"
     volumes:
       - /home/$DEPLOY_USER/s-ui/db:/app/db
       - ${CERT_DST}:/app/cert:ro
