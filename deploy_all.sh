@@ -231,8 +231,9 @@ CRON_JOB="$CRON_SCHEDULE /home/$DEPLOY_USER/smart_run.sh"
 sudo -u $DEPLOY_USER bash -c "(crontab -l 2>/dev/null | grep -v 'smart_run.sh'; echo '$CRON_JOB') | crontab -"
 
 # -------------------------
+su - $DEPLOY_USER -c "docker compose up -d"
 echo "==== [DEPLOY] Deployment complete! ===="
 echo "Next steps:"
 echo "1. Switch to user: su - $DEPLOY_USER"
-echo "2. Run docker compose up -d for initial sync"
-echo "3. Run docker exec -it tailscale tailscale up"
+echo "2. Run docker exec -it tailscale tailscale up"
+
