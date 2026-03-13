@@ -3,7 +3,7 @@
 
 # 最终用户
 DEPLOY_USER="sui"
-USER_EMAIL="youmail@gmail.com"
+USER_EMAIL="xxx@gmail.com"
 
 # 时区
 TIMEZONE="America/Los_Angeles"
@@ -12,7 +12,7 @@ TIMEZONE="America/Los_Angeles"
 SNI="www.microsoft.com"
 
 # 域名列表(1个或多个)
-DOMAINLIST=("xxx.xxx.xxx" "yyy.yyy.yyy")
+DOMAINLIST=("xxx.duckdns.org")
 
 # 证书目录
 CERT_SRC="/etc/letsencrypt/live/${DOMAINLIST[0]}"

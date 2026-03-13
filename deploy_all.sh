@@ -169,6 +169,10 @@ services:
   nginx:
     image: nginx:latest
     container_name: ${NGINX_CONTAINER}
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     restart: unless-stopped
     environment:
       - TZ=${TIMEZONE}
@@ -184,12 +188,17 @@ services:
     image: alireza7/s-ui
     container_name: ${SINGBOX_CONTAINER}
     restart: unless-stopped
+    network_mode: "host"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
     environment:
       - TZ=${TIMEZONE}
     user: "${DEPLOY_UID}:${DEPLOY_GID}"
     volumes:
       - /home/$DEPLOY_USER/s-ui/db:/app/db
       - ${CERT_DST}:/app/cert:ro
+      - /etc/resolv.conf:/etc/resolv.conf:ro
     tty: true
     ports:
       - "443:443/udp"
@@ -202,12 +211,14 @@ services:
   tailscale:
     image: tailscale/tailscale:latest
     container_name: tailscale
-    network_mode: "host"           # 必须 host 模式
+    network_mode: "host"
     cap_add:
       - NET_ADMIN
       - NET_RAW
     volumes:
       - /home/$DEPLOY_USER/tailscale:/var/lib/tailscale
+      - /etc/resolv.conf:/etc/resolv.conf
+    devices:
       - /dev/net/tun:/dev/net/tun
     command: ["tailscaled", "--state=/var/lib/tailscale/tailscaled.state"]
 
