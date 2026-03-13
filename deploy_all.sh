@@ -46,9 +46,9 @@ fi
 # 1. 创建新用户（如果不存在）
 if ! id "$DEPLOY_USER" &>/dev/null; then
     adduser --gecos "" "$DEPLOY_USER"
-	# 准备用户目录
-	mkdir -p /home/$DEPLOY_USER
-	chown -R $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER
+        # 准备用户目录
+        mkdir -p /home/$DEPLOY_USER
+        chown -R $DEPLOY_USER:$DEPLOY_USER /home/$DEPLOY_USER
 fi
 
 # 2. 将新用户加入 docker 用户组
@@ -126,6 +126,7 @@ ufw allow 22/tcp
 ufw allow 80/tcp
 ufw allow 443/tcp
 ufw allow 443/udp
+ufw allow 8443/tcp
 ufw allow 8443/udp
 #ufw allow 3478/udp
 ufw allow 41641/udp
@@ -192,8 +193,11 @@ services:
     tty: true
     ports:
       - "443:443/udp"
+      - "8443:8443/tcp"
       - "8443:8443/udp"
     entrypoint: "./entrypoint.sh"
+    depends_on:
+      - tailscale
 
   tailscale:
     image: tailscale/tailscale:latest
@@ -238,4 +242,3 @@ echo "==== [DEPLOY] Deployment complete! ===="
 echo "Next steps:"
 echo "1. Switch to user: su - $DEPLOY_USER"
 echo "2. Run docker exec -it tailscale tailscale up"
-
