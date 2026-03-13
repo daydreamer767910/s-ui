@@ -194,7 +194,6 @@ services:
       - NET_RAW
     environment:
       - TZ=${TIMEZONE}
-    user: "${DEPLOY_UID}:${DEPLOY_GID}"
     volumes:
       - /home/$DEPLOY_USER/s-ui/db:/app/db
       - ${CERT_DST}:/app/cert:ro
