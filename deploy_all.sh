@@ -236,5 +236,5 @@ sudo -u $DEPLOY_USER bash -c "(crontab -l 2>/dev/null | grep -v 'smart_run.sh'; 
 su - $DEPLOY_USER -c "docker compose up -d"
 echo "==== [DEPLOY] Deployment complete! ===="
 echo "Next steps:"
-echo "1. Switch to user: su - $DEPLOY_USER"
-echo "2. Run docker exec -it tailscale tailscale up"
+echo "Switch to user: su - $DEPLOY_USER"
+
