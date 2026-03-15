@@ -197,29 +197,15 @@ services:
     volumes:
       - /home/$DEPLOY_USER/s-ui/db:/app/db
       - ${CERT_DST}:/app/cert:ro
-      - /etc/resolv.conf:/etc/resolv.conf:ro
+      - /etc/resolv.conf:/etc/resolv.conf
+    devices:
+      - /dev/net/tun:/dev/net/tun
     tty: true
     ports:
       - "443:443/udp"
       - "8443:8443/tcp"
       - "8443:8443/udp"
     entrypoint: "./entrypoint.sh"
-    depends_on:
-      - tailscale
-
-  tailscale:
-    image: tailscale/tailscale:latest
-    container_name: tailscale
-    network_mode: "host"
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
-    volumes:
-      - /home/$DEPLOY_USER/tailscale:/var/lib/tailscale
-      - /etc/resolv.conf:/etc/resolv.conf
-    devices:
-      - /dev/net/tun:/dev/net/tun
-    command: ["tailscaled", "--state=/var/lib/tailscale/tailscaled.state"]
 
 EOF
 
